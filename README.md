@@ -1,12 +1,6 @@
 # 📄 CRM Lead Automation — n8n Automation
 
 
-
-
-
-
-\
-
 An AI-powered Customer Relationship Management (CRM) workflow built using **n8n**, **Google Gemini AI**, **Google Sheets**, **Telegram Bot API**, **Gmail**, and the **n8n Form Trigger**.
 
 This workflow automatically receives business inquiries through an online form, analyzes each lead using Artificial Intelligence, assigns a qualification score, classifies lead priority, stores lead information in Google Sheets, notifies the sales team of high-value opportunities, and sends automated email responses.
