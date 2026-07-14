@@ -156,7 +156,7 @@ K --> L["📧 Gmail Sales Notification"]
 
 J --> M["📧 Gmail Customer Auto Reply"]
 
-L --> N["✅ Respond to Form"]
+L --> N["✅ Form Ending"]
 
 M --> N
 ```
@@ -282,7 +282,7 @@ Gmail (Customer)
 
 ↓
 
-Respond to Form
+Form Ending
 ```
 
 ---
@@ -290,13 +290,13 @@ Respond to Form
 
 ---
 
-# Workflow 1 — CRM Lead Qualification Pipeline
+## Workflow 1 — CRM Lead Qualification Pipeline
 
 This workflow automates the complete customer lead qualification process, from receiving a business inquiry to notifying the sales team and updating the CRM database.
 
 ---
 
-# Node 1 — n8n Form Trigger
+### Node 1 — n8n Form Trigger
 
 ## Purpose
 
@@ -354,7 +354,7 @@ Please fill out the form below and our sales team will contact you.
 
 ---
 
-# Node 2 — Edit Fields
+### Node 2 — Edit Fields
 
 ## Purpose
 
@@ -394,7 +394,7 @@ This node creates a clean and predictable data structure that every downstream n
 
 ---
 
-# Node 3 — Google Gemini AI Agent
+### Node 3 — Google Gemini AI Agent
 
 ## Purpose
 
@@ -444,7 +444,7 @@ The AI returns structured JSON.
 
 ---
 
-# Node 4 — JavaScript Code Node
+### Node 4 — JavaScript Code Node
 
 ## Purpose
 
@@ -493,7 +493,7 @@ Structured CRM Record
 
 ---
 
-# Node 5 — IF Node
+### Node 5 — IF Node
 
 ## Purpose
 
@@ -542,7 +542,7 @@ Actions
 
 ---
 
-# Node 6 — Google Sheets (Hot Leads)
+### Node 6 — Google Sheets (Hot Leads)
 
 ## Purpose
 
@@ -579,7 +579,7 @@ Each Hot Lead becomes a permanent CRM record for future sales activities.
 
 ---
 
-# Node 7 — Telegram Notification
+### Node 7 — Telegram Notification
 
 ## Purpose
 
@@ -623,7 +623,7 @@ Schedule a product demonstration within 24 hours.
 
 ---
 
-# Node 8 — Gmail (Sales Notification)
+### Node 8 — Gmail (Sales Notification)
 
 ## Purpose
 
@@ -675,7 +675,7 @@ Generated automatically by the CRM Lead Automation workflow.
 
 ---
 
-# Node 9 — Google Sheets (Cold Leads)
+### Node 9 — Google Sheets (Cold Leads)
 
 ## Purpose
 
@@ -699,7 +699,7 @@ Cold
 
 ---
 
-# Node 10 — Gmail (Customer Auto Reply)
+### Node 10 — Gmail (Customer Auto Reply)
 
 ## Purpose
 
@@ -737,7 +737,7 @@ Sales Team
 
 ---
 
-# Node 11 — Respond to Form
+### Node 11 — Form Ending
 
 ## Purpose
 
@@ -786,7 +786,7 @@ F -->|NO| J["📊 Google Sheets"]
 
 J --> K["📧 Gmail Customer"]
 
-I --> L["✅ Respond to Form"]
+I --> L["✅ Form Ending"]
 
 K --> L
 ```
@@ -940,7 +940,7 @@ Your CRM automation is now ready to receive customer inquiries.
 | Telegram        | Hot Lead notification sent |
 | Gmail Sales     | Email notification sent    |
 | Gmail Customer  | Thank-you email sent       |
-| Respond to Form | Success message displayed  |
+| Form Ending | Success message displayed  |
 
 ---
 
@@ -1061,7 +1061,7 @@ CRM-Lead-Automation/
 │   ├── telegram.png
 │   ├── gmail-sales.png
 │   ├── gmail-customer.png
-│   ├── respond-to-form.png
+│   ├── form-ending.png
 │   └── execution.png
 │
 ├── sample-data/
