@@ -1,0 +1,831 @@
+{
+  "name": "CRM Lead Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "CRM Lead Automation Demo",
+        "formDescription": "Please fill out the form below and our sales team will contact you.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "fieldName": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "fieldName": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company",
+              "fieldName": "company",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Job Title",
+              "fieldName": "jobTitle",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Number of Employees",
+              "fieldType": "number",
+              "fieldName": "employees",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Estimated Budget (USD)",
+              "fieldType": "number",
+              "fieldName": "budget",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "How can we help?",
+              "fieldType": "textarea",
+              "fieldName": "message",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "32f54a15-4a05-494a-b9b0-8665c1ac1879",
+      "name": "On form submission",
+      "webhookId": "3374e559-57db-45a5-a0c3-0a1740e54c5d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a782496c-156f-4c20-b78f-d766ec75bcf9",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "8798dc60-adf4-4e79-8021-f9c18b90889b",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "84519000-0442-4ee6-ac6d-c5c6eaaacb48",
+              "name": "email",
+              "value": "={{$json.email}}",
+              "type": "string"
+            },
+            {
+              "id": "51afd1ed-3d86-455b-b0cc-c2201d70b047",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "a0c1b04d-c69d-4554-b018-f1021b910c9f",
+              "name": "job title",
+              "value": "={{ $json.jobTitle }}",
+              "type": "string"
+            },
+            {
+              "id": "f2823a6b-855f-4aa6-b3fd-9397b76fe175",
+              "name": "employees",
+              "value": "={{ $json.employees }}",
+              "type": "string"
+            },
+            {
+              "id": "96096b04-b2ce-486c-9875-ed62f0aad251",
+              "name": "budget",
+              "value": "={{ $json.budget }}",
+              "type": "string"
+            },
+            {
+              "id": "866d74e1-01e7-4d0d-ae41-e867287e0fe2",
+              "name": "message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "23170a72-c2f5-42bb-b836-3bd74e260768",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer Information\n\nName:\n{{$json.name}}\n\nCompany:\n{{$json.company}}\n\nJob Title:\n{{$json.jobTitle}}\n\nEmployees:\n{{$json.employees}}\n\nBudget:\n{{$json.budget}}\n\nInquiry:\n{{$json.message}}",
+        "options": {
+          "systemMessage": "=You are an experienced CRM lead qualification specialist.\n\nYour task is to analyze business inquiries and score each lead.\n\nEvaluate:\n\nLead Score (0-100)\n\nPriority\n\nIndustry\n\nSummary\n\nRecommended Next Action\n\nConfidence\n\nScoring Guidelines\n\n90-100\nLarge company with high budget and clear business need.\n\n70-89\nMedium company with good budget.\n\n50-69\nSmall business with moderate interest.\n\nBelow 50\nLow-value lead.\n\nReturn STRICT JSON only.\n\nThe property names MUST be exactly:\n\n{\n  \"lead_score\": number,\n  \"priority\": string,\n  \"industry\": string,\n  \"summary\": string,\n  \"next_action\": string,\n  \"confidence\": number\n}\n\n\nEvery string must be valid JSON.\n\nNever output \\$.\n\nUse $ instead.\n\nNo markdown.\n\nNo explanations."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "847a7b90-4439-4afd-a47f-7196f165bc7c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "b002b9d5-e901-4b7f-aac1-65a8cefff88a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "QDj45Ha7qs7vErnq",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const cleaned = $json.output.replace(/\\\\\\$/g, '$');\n\nconst ai = JSON.parse(cleaned);\n\nreturn [{\n  json: {\n    ...$('Edit Fields').first().json,\n    lead_score: ai.lead_score,\n    priority: ai.priority,\n    industry: ai.industry,\n    summary: ai.summary,\n    next_action: ai.next_action,\n    confidence: ai.confidence\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "b24cadb3-c901-4461-9c6e-dcaa32a07e5d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ca14b6b-d2ae-4ef5-9535-f224cbeca3a5",
+              "leftValue": "={{ $json.lead_score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        976,
+        0
+      ],
+      "id": "72115e50-bae9-4b6f-8110-7677dd32542a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1k-CjdkJArgUB5ianLrheqKBnRRK-aYL8RdrUmzSjxjU",
+          "mode": "list",
+          "cachedResultName": "CRM Lead Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k-CjdkJArgUB5ianLrheqKBnRRK-aYL8RdrUmzSjxjU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k-CjdkJArgUB5ianLrheqKBnRRK-aYL8RdrUmzSjxjU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Company": "={{ $json.company }}",
+            "Job Title": "={{ $json['job title'] }}",
+            "Employees": "={{ $json.employees }}",
+            "Budget": "={{ $json.budget }}",
+            "Industry": "={{ $json.industry }}",
+            "Lead Score": "={{ $json.lead_score }}",
+            "Priority": "={{ $json.priority }}",
+            "Summary": "={{ $json.industry }}",
+            "Next Action": "={{ $json.next_action }}",
+            "Confidence": "={{ $json.confidence }}",
+            "Status": "Hot"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employees",
+              "displayName": "Employees",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Next Action",
+              "displayName": "Next Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        -96
+      ],
+      "id": "34c6fa72-4c7f-4283-822e-3212f72c49b6",
+      "name": "Hot Lead Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OKkqDH11KnvqdjLy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1k-CjdkJArgUB5ianLrheqKBnRRK-aYL8RdrUmzSjxjU",
+          "mode": "list",
+          "cachedResultName": "CRM Lead Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k-CjdkJArgUB5ianLrheqKBnRRK-aYL8RdrUmzSjxjU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1k-CjdkJArgUB5ianLrheqKBnRRK-aYL8RdrUmzSjxjU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Company": "={{ $json.company }}",
+            "Job Title": "={{ $json['job title'] }}",
+            "Employees": "={{ $json.employees }}",
+            "Budget": "={{ $json.budget }}",
+            "Industry": "={{ $json.industry }}",
+            "Lead Score": "={{ $json.lead_score }}",
+            "Priority": "={{ $json.priority }}",
+            "Summary": "={{ $json.industry }}",
+            "Next Action": "={{ $json.next_action }}",
+            "Confidence": "={{ $json.confidence }}",
+            "Status": "Cold"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employees",
+              "displayName": "Employees",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Next Action",
+              "displayName": "Next Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Confidence",
+              "displayName": "Confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        96
+      ],
+      "id": "f7012592-8fc0-453e-a752-f481cb8dd3d8",
+      "name": "Cold Leads Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OKkqDH11KnvqdjLy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Thank you for contacting us",
+        "emailType": "text",
+        "message": "=Hello {{$json.Name}},\n\nThank you for contacting us.\n\nWe have successfully received your inquiry and appreciate your interest in our services.\n\nOur team will review your request and get back to you if additional information is needed.\n\nBest regards,\nSales Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1408,
+        96
+      ],
+      "id": "1b24b659-7622-4525-ae98-8dd979a828b2",
+      "name": "Gmail (Customer)",
+      "webhookId": "c91080aa-9e46-4ee1-959b-6097349d2c0a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jLxWaRUIVsLiAsVq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5518864435",
+        "text": "=🔥 NEW HOT LEAD\n\n👤 Name: {{$json.name}}\n\n🏢 Company: {{$json.company}}\n\n💼 Job Title: {{$json.jobTitle}}\n\n📧 Email: {{$json.email}}\n\n👥 Employees: {{$json.employees}}\n\n💰 Budget: ${{$json.budget}}\n\n⭐ Lead Score: {{$json.lead_score}}\n\n📌 Priority: {{$json.priority}}\n\n🏭 Industry: {{$json.industry}}\n\n📝 Summary:\n{{$json.summary}}\n\n➡ Recommended Action:\n{{$json.next_action}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1408,
+        -96
+      ],
+      "id": "428ba4c7-697b-4912-9e42-33663b612ecd",
+      "name": "Telegram (Notify Sales Team)",
+      "webhookId": "b57dc160-f8ac-45ee-bbd9-e90c7437fdaa",
+      "credentials": {
+        "telegramApi": {
+          "id": "X1seE7bqguReBgbq",
+          "name": "AI Resume Screening V2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=samplessale@companyemail.com",
+        "subject": "=🔥 New Hot Lead - {{$json.company}}",
+        "message": "=<p><strong>Employees:</strong> {{$json.employees}}</p>\n\n<p><strong>Budget:</strong> ${{$json.budget}}</p>\n\n<p><strong>Lead Score:</strong> {{$json.lead_score}}</p>\n\n<p><strong>Priority:</strong> {{$json.priority}}</p>\n\n<p><strong>Industry:</strong> {{$json.industry}}</p>\n\n<h3>Summary</h3>\n\n<p>{{$json.summary}}</p>\n\n<h3>Recommended Next Action</h3>\n\n<p>{{$json.next_action}}</p>\n\n<hr>\n\n<p>This email was generated automatically by the CRM Lead Automation workflow.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        -96
+      ],
+      "id": "a9e15283-c727-42e3-b48c-d41c02ef05ef",
+      "name": "Gmail (Notify Sales Team)",
+      "webhookId": "c91080aa-9e46-4ee1-959b-6097349d2c0a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jLxWaRUIVsLiAsVq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "🎉 Thank You for Your Inquiry!",
+        "completionMessage": "We've successfully received your inquiry.\n\nBased on the information you provided, our sales team will review your request as a priority.\n\nOne of our representatives will contact you shortly using the email address you submitted.\n\nWe appreciate your interest and look forward to working with you!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1776,
+        -96
+      ],
+      "id": "9228995d-4803-4785-a3a8-e99cb1df0a8b",
+      "name": "Form",
+      "webhookId": "cf1afc8e-6722-442b-bb3d-8f6dc1ef17ff"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "✅ Inquiry Received Successfully",
+        "completionMessage": "Thank you for reaching out to us.\n\nWe've successfully received your inquiry and have sent a confirmation email to your inbox.\n\nOur team will review your request and contact you if additional information is needed.\n\nWe appreciate your interest and hope to work with you soon!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1600,
+        96
+      ],
+      "id": "0293124f-2b1f-461a-9dc8-e8eddf083b03",
+      "name": "Form1",
+      "webhookId": "cf1afc8e-6722-442b-bb3d-8f6dc1ef17ff"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Hot Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cold Leads Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hot Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Telegram (Notify Sales Team)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cold Leads Data": {
+      "main": [
+        [
+          {
+            "node": "Gmail (Customer)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram (Notify Sales Team)": {
+      "main": [
+        [
+          {
+            "node": "Gmail (Notify Sales Team)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail (Notify Sales Team)": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail (Customer)": {
+      "main": [
+        [
+          {
+            "node": "Form1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "823dd28f-1843-421c-a4fb-b61f78f07e0c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "nodeGroups": [],
+  "id": "5SWLUSBF3YtDwj2z",
+  "tags": []
+}
